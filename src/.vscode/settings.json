@@ -1,0 +1,7 @@
+{
+  "explorer.sortOrder": "type",
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+  }
+}

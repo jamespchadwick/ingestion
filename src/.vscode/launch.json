@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (Discovery Cli)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build discovery_cli",
+      "program": "${workspaceFolder}/Ingestion.Applications.Discovery.Cli/bin/Debug/net7.0/Ingestion.Applications.Discovery.Cli.dll",
+      "args":[ ],
+      "env": { },
+      "cwd": "${workspaceFolder}/Ingestion.Applications.Discovery.Cli",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": ".NET Core Launch (Processing Cli)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build processing_cli",
+      "program": "${workspaceFolder}/Ingestion.Applications.Processing.Cli/bin/Debug/net7.0/Ingestion.Applications.Processing.Cli.dll",
+      "args":[ ],
+      "env": { },
+      "cwd": "${workspaceFolder}/Ingestion.Applications.Processing.Cli",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Discovery & Processing",
+      "configurations": [
+        ".NET Core Launch (Discovery Cli)",
+        ".NET Core Launch (Processing Cli)"
+      ],
+      "stopAll": true
+    }
+  ]
+}
