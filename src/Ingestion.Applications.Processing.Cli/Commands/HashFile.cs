@@ -6,12 +6,13 @@ namespace JamesPChadwick.Ingestion.Applications.Processing.Cli.Commands
   using JamesPChadwick.Ingestion.Applications.Processing.Cli.Services;
   using JamesPChadwick.Ingestion.Domain.Aggregates.FileAggregate;
   using JamesPChadwick.Ingestion.Messages;
+  using JamesPChadwick.Ingestion.Models;
   using MediatR;
   using Microsoft.Extensions.Logging;
 
   public class HashFile : IRequest<Unit>
   {
-    public string? FilePath { get; set; }
+    public FileData? FileData { get; set; }
   }
 
   public class HashFileHandler : IRequestHandler<HashFile, Unit>
@@ -27,19 +28,48 @@ namespace JamesPChadwick.Ingestion.Applications.Processing.Cli.Commands
       IMessagingService messagingService,
       ILogger<HashFileHandler> logger)
     {
-      this.fileHashingService = fileHashingService;
-      this.fileRepository = fileRepository;
-      this.messagingService = messagingService;
-      this.logger = logger;
+      this.fileHashingService = fileHashingService ?? throw new ArgumentNullException(nameof(fileHashingService));
+      this.fileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
+      this.messagingService = messagingService ?? throw new ArgumentNullException(nameof(messagingService));
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<Unit> Handle(HashFile command, CancellationToken cancellationToken)
     {
-      var file = await fileRepository.FindByPath(command.FilePath ?? throw new NullReferenceException());
+      File? file;
+
+      if (!string.IsNullOrWhiteSpace(command.FileData?.Path))
+      {
+        file = await fileRepository.FindByPath(command.FileData.Path);
+
+        if (file is not null)
+        {
+          return Unit.Value;
+        }
+      }
+
+      file = new File(
+        command.FileData?.Name ?? string.Empty,
+        string.Empty,
+        command.FileData?.Path ?? string.Empty,
+        command.FileData?.Size,
+        command.FileData?.CreatedOnUtc ?? System.DateTimeOffset.UtcNow);
 
       file.Hash = await fileHashingService.CalculateHash(file);
 
-      fileRepository.Update(file);
+      file = fileRepository.Add(file);
+
+      messagingService.QueueMessageAsync(new FileHashed
+      {
+          FileData = new Models.FileData
+          {
+            Name = file.Name,
+            Hash = file.Hash,
+            Path = file.Path,
+            Size = file.Size,
+            CreatedOnUtc = file.CreatedOnUtc
+          }
+      });
 
       await fileRepository.UnitOfWork.SaveEntitiesAsync();
 

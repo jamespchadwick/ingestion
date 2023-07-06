@@ -17,7 +17,7 @@ namespace JamesPChadwick.Ingestion.Applications.Processing.Cli
     {
       return services.AddMediatR(configuration =>
       {
-        configuration.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        configuration.RegisterServicesFromAssemblyContaining(typeof(Program));
         configuration.AddOpenBehavior(typeof(LoggingBehavior<,>));
         configuration.AddOpenBehavior(typeof(TransactionBehavior<,>));
       });

@@ -18,8 +18,9 @@ namespace JamesPChadwick.Ingestion.Applications.Processing.Cli.Modules
 
     protected override void Load(ContainerBuilder builder)
     {
-      builder.RegisterType<BlobFileHashingService>().As<IFileHashingService>();
-      builder.RegisterType<MessagingService>().As<IMessagingService>();
+      builder.RegisterType<BlobFileHashingService>().As<IFileHashingService>().InstancePerLifetimeScope();
+      builder.RegisterType<IdempotencyService>().As<IIdempotencyService>().InstancePerLifetimeScope();
+      builder.RegisterType<MessagingService>().As<IMessagingService>().InstancePerLifetimeScope();
 
       builder.RegisterAssemblyTypes(typeof(Program).GetTypeInfo().Assembly)
         .AsClosedTypesOf(typeof(IMessageHandler<>));

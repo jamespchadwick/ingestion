@@ -7,7 +7,7 @@ namespace JamesPChadwick.Ingestion.Domain.Aggregates.FileAggregate
   {
     File Add(File file);
 
-    Task<File> FindByPath(string path);
+    Task<File?> FindByPath(string path);
 
     void Update(File file);
   }

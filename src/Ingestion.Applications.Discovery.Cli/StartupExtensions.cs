@@ -17,7 +17,6 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli
       {
         configuration.RegisterServicesFromAssembly(typeof(Program).Assembly);
         configuration.AddOpenBehavior(typeof(LoggingBehavior<,>));
-        configuration.AddOpenBehavior(typeof(TransactionBehavior<,>));
       });
     }
 

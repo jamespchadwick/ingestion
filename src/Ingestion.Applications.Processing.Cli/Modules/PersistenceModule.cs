@@ -24,6 +24,7 @@ namespace JamesPChadwick.Ingestion.Applications.Processing.Cli.Modules
 
       builder.RegisterType<FileRepository>().AsImplementedInterfaces().InstancePerLifetimeScope();
       builder.RegisterType<MessageRepository>().AsImplementedInterfaces().InstancePerLifetimeScope();
+      builder.RegisterType<RequestRepository>().AsImplementedInterfaces().InstancePerLifetimeScope();
     }
   }
 }

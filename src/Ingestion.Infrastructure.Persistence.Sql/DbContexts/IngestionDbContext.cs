@@ -6,6 +6,7 @@ namespace JamesPChadwick.Ingestion.Infrastructure.Persistence.Sql.DbContexts
   using System.Threading.Tasks;
   using JamesPChadwick.Ingestion.Domain.Aggregates.FileAggregate;
   using JamesPChadwick.Ingestion.Domain.Aggregates.MessageAggregate;
+  using JamesPChadwick.Ingestion.Domain.Aggregates.RequestAggregate;
   using JamesPChadwick.Ingestion.Domain.Seedwork;
   using Microsoft.EntityFrameworkCore;
   using Microsoft.EntityFrameworkCore.Storage;
@@ -22,6 +23,8 @@ namespace JamesPChadwick.Ingestion.Infrastructure.Persistence.Sql.DbContexts
     public DbSet<File> Files { get; set; } = null!;
 
     public DbSet<Message> Messages { get; set; } = null!;
+
+    public DbSet<Request> Requests { get; set; } = null!;
 
     public bool HasActiveTransaction => currentTransaction != null;
 

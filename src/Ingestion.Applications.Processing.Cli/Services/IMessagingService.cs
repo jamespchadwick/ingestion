@@ -34,6 +34,7 @@ namespace JamesPChadwick.Ingestion.Applications.Processing.Cli.Services
       this.logger = logger;
 
       messageTypes.Add(typeof(FileDiscovered));
+      messageTypes.Add(typeof(FileHashed));
     }
 
     public virtual async Task PublishMessages(Guid scope)

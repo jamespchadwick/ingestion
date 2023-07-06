@@ -80,5 +80,8 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\ingestion.File.sql" />
+    <Build Include="Tables\ingestion.Request.sql" />
+    <Build Include="Tables\ingestion.RequestStatus.sql" />
+    <None Include="_Scripts\PostDeployment\Seed_ingestion_RequestStatus.sql" />
   </ItemGroup>
 </Project>

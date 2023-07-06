@@ -30,9 +30,9 @@ namespace JamesPChadwick.Ingestion.Infrastructure.Persistence.Sql.Repositories
       }
     }
 
-    public async Task<File> FindByPath(string path)
+    public async Task<File?> FindByPath(string path)
     {
-      return await dbContext.Files.SingleAsync(file => file.Path == path);
+      return await dbContext.Files.SingleOrDefaultAsync(file => file.Path == path);
     }
 
     public void Update(File file)

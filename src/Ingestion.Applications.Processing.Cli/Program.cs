@@ -44,6 +44,7 @@
         {
           var messagingClient = scope.Resolve<IMessagingClient>();
           messagingClient.Subscribe<FileDiscovered, IMessageHandler<FileDiscovered>>();
+          messagingClient.Subscribe<FileHashed, IMessageHandler<FileHashed>>();
 
           Console.ReadKey();
         }

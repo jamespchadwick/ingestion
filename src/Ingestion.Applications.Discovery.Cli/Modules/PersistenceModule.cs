@@ -22,7 +22,6 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Modules
         .As<DbConnection>()
         .InstancePerLifetimeScope();
 
-      builder.RegisterType<FileRepository>().AsImplementedInterfaces().InstancePerLifetimeScope();
       builder.RegisterType<MessageRepository>().AsImplementedInterfaces().InstancePerLifetimeScope();
     }
   }

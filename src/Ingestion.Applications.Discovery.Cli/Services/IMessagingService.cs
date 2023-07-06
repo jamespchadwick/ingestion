@@ -4,6 +4,7 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Services
   using System.Collections.Generic;
   using System.Linq;
   using System.Text.Json;
+  using System.Threading;
   using System.Threading.Tasks;
   using JamesPChadwick.Ingestion.Domain.Aggregates.MessageAggregate;
   using JamesPChadwick.Ingestion.Infrastructure.Messaging.Clients;
@@ -12,9 +13,9 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Services
 
   public interface IMessagingService
   {
-    Task PublishMessages(Guid scope);
+    Task PublishMessages(Guid scope, CancellationToken cancellationToken);
 
-    void QueueMessageAsync(Infrastructure.Messaging.Messages.Message payload);
+    Task QueueMessageAsync(Guid scope, Infrastructure.Messaging.Messages.Message payload, CancellationToken cancellationToken);
   }
 
   public class MessagingService : IMessagingService
@@ -36,7 +37,7 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Services
       messageTypes.Add(typeof(FileDiscovered));
     }
 
-    public virtual async Task PublishMessages(Guid scope)
+    public virtual async Task PublishMessages(Guid scope, CancellationToken cancellationToken)
     {
       var unpublishedMessages = await messageRepository.FindByStatus(MessageStatus.Unpublished, scope);
 
@@ -60,7 +61,7 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Services
       }
     }
 
-    public virtual void QueueMessageAsync(Infrastructure.Messaging.Messages.Message payload)
+    public virtual async Task QueueMessageAsync(Guid scope, Infrastructure.Messaging.Messages.Message payload, CancellationToken cancellationToken)
     {
       var message = new Domain.Aggregates.MessageAggregate.Message(
         payload.Id,
@@ -68,9 +69,11 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Services
         JsonSerializer.Serialize(payload, payload.GetType()),
         payload.TimeStamp);
 
-      message.SetScope(messageRepository.UnitOfWork.TransactionId ?? throw new NullReferenceException());
+      message.SetScope(scope);
 
       messageRepository.Add(message);
+
+      await messageRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
     }
 
     private async Task UpdateMessageStatus(Guid guid, MessageStatus status)

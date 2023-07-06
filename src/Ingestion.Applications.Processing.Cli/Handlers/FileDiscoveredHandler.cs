@@ -2,52 +2,40 @@ namespace JamesPChadwick.Ingestion.Applications.Discovery.Cli.Handlers
 {
   using System;
   using System.Threading.Tasks;
-  using JamesPChadwick.Ingestion.Applications.Processing.Cli.Services;
-  using JamesPChadwick.Ingestion.Domain.Aggregates.FileAggregate;
+  using JamesPChadwick.Ingestion.Applications.Processing.Cli.Commands;
   using JamesPChadwick.Ingestion.Infrastructure.Messaging.Messages;
   using JamesPChadwick.Ingestion.Messages;
+  using MediatR;
   using Microsoft.Extensions.Logging;
 
   public class FileDiscoveredHandler : IMessageHandler<FileDiscovered>
   {
-    private readonly IFileHashingService fileHashingService;
-    private readonly IFileRepository fileRepository;
-    private readonly IMessagingService messagingService;
+    private readonly IMediator mediator;
     private readonly ILogger<FileDiscoveredHandler> logger;
 
     public FileDiscoveredHandler(
-      IFileHashingService fileHashingService,
-      IFileRepository fileRepository,
-      IMessagingService messagingService,
+      IMediator mediator,
       ILogger<FileDiscoveredHandler> logger)
     {
-      this.fileHashingService = fileHashingService ?? throw new ArgumentNullException(nameof(fileHashingService));
-      this.fileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
-      this.messagingService = messagingService ?? throw new ArgumentNullException(nameof(messagingService));
+      this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task Handle(FileDiscovered message)
     {
-      var file = await fileRepository.FindByPath(message.FileData?.Path ?? throw new NullReferenceException());
-
-      file.Hash = await fileHashingService.CalculateHash(file);
-
-      fileRepository.Update(file);
-
-      messagingService.QueueMessageAsync(new FileHashed
+      var hashFileCommand = new HashFile
       {
-          FileData = new Models.FileData
-          {
-            Name = file.Name,
-            Hash = file.Hash,
-            Path = file.Path,
-            Size = file.Size,
-            CreatedOnUtc = file.CreatedOnUtc
-          }
-      });
+        FileData = new Models.FileData
+        {
+          Name = message.FileData?.Name,
+          Hash = message.FileData?.Hash,
+          Path = message.FileData?.Path,
+          Size = message.FileData?.Size,
+          CreatedOnUtc = message.FileData?.CreatedOnUtc
+        }
+      };
 
-      await fileRepository.UnitOfWork.SaveEntitiesAsync();
+      await mediator.Send(hashFileCommand);
     }
   }
 }

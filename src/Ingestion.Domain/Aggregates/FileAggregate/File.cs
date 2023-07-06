@@ -29,5 +29,7 @@ namespace JamesPChadwick.Ingestion.Domain.Aggregates.FileAggregate
     public long? Size { get; set; }
 
     public DateTimeOffset CreatedOnUtc { get; set; }
+
+    public bool IsPartialFile => Name.ToUpper().Contains("FILEPART");
    }
 }
